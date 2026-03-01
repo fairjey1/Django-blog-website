@@ -1,0 +1,40 @@
+{% extends 'base.html' %}
+{% block title %}Perfil de {{ user_profile.username }} | Mi Universidad{% endblock %}
+
+
+{% block content %}
+<!-- Template para mostrar el perfil del usuario -->
+ <div class="perfil-header">
+        <h1>Perfil de {{ user_profile.username }}</h1>
+        <p><strong>Email:</strong> {{ user_profile.email }}</p>
+        <p><strong>Miembro desde:</strong> {{ user_profile.date_joined|date:"d/m/Y" }}</p> 
+
+        {% if user.is_authenticated %}
+            
+            {% if user == user_profile %}
+                <a href="#">Editar mi perfil</a>
+            {% else %}
+                <button>Seguir a {{ user_profile.username }}</button>
+            {% endif %}
+
+        {% endif %}
+    </div>
+
+    <hr>
+
+    <div class="perfil-estadisticas">
+        <h3>Estadísticas en el Foro</h3>
+        <ul>
+            <li><strong>Seguidores:</strong> 0</li>
+            <li><strong>Siguiendo:</strong> 0</li>
+            <li><strong>Temas creados:</strong> 0</li>
+        </ul>
+    </div>
+
+    <hr>
+
+    <div class="perfil-actividad">
+        <h3>Últimas Contribuciones</h3>
+        <p><em>Aquí mostraremos los posts de {{ user_profile.username }} en las facultades cuando creemos la app "forums".</em></p>
+    </div>
+{% endblock %}
