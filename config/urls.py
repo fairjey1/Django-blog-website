@@ -23,4 +23,5 @@ urlpatterns = [
     path('admin/', admin.site.urls),
     path('', TemplateView.as_view(template_name='index.html'), name='inicio'),
     path('users/', include('apps.users.urls', namespace='users')),
+    path('forums/', include('apps.forums.urls', namespace='forums')),
 ]

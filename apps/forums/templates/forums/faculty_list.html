@@ -1,0 +1,24 @@
+{% extends 'base.html' %}
+
+{% block title %}Facultades | Mi Universidad{% endblock %}
+
+{% block content %}
+    <h1>Explorar Facultades</h1>
+    <p>Selecciona una facultad para ver sus foros y discusiones.</p>
+
+    <div class="facultades-grid">
+        {% for facultad in faculties %}
+            <div class="tarjeta-facultad" style="border: 1px solid #ccc; padding: 15px; margin-bottom: 10px;">
+                <h2>
+                    <a href="{% url 'forums:faculty_feed' short_name=facultad.short_name %}">
+                    {{ facultad.name }} ({{ facultad.short_name }})
+                    </a>
+                </h2>
+                <p>{{ facultad.description }}</p>
+                <small>👥 Seguidores: {{ facultad.get_subscriber_count }}</small>
+            </div>
+        {% empty %}
+            <p>Aún no hay facultades registradas en el sistema.</p>
+        {% endfor %}
+    </div>
+{% endblock content %}

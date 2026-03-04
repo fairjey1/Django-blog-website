@@ -1,0 +1,46 @@
+{% extends 'base.html' %}
+
+{% block title %}{{ faculty.short_name }} | Feed{% endblock %}
+
+{% block content %}
+    <div class="feed-header">
+        <h1>Foros de {{ faculty.name }}</h1>
+        <p>{{ faculty.description }}</p>
+        
+        {% if user.is_authenticated %}
+            <button>⭐ Seguir Facultad</button>
+        {% else %}
+            <div style="background-color: #f8f9fa; padding: 10px; border-left: 4px solid orange;">
+                <p>Estás en modo solo lectura. <a href="{% url 'users:login' %}?next={{ request.path }}">Inicia sesión</a> para crear temas y participar.</p>
+            </div>
+        {% endif %}
+    </div>
+
+    <hr>
+
+    <h2>Subforos Disponibles</h2>
+    
+    {% regroup faculty.forums.all by category as foros_agrupados %}
+
+    {% for grupo in foros_agrupados %}
+        
+        <div class="categoria-seccion" style="margin-top: 20px; border: 1px solid #ccc; padding: 15px; border-radius: 8px;">
+            <h3 style="background-color: #f0f0f0; padding: 5px;">
+                {{ grupo.grouper|default:"Otros / Sin Categorizar" }}
+            </h3>
+            
+            <ul class="lista-foros" style="list-style: none; padding-left: 0;">
+                {% for foro in grupo.list %}
+                    <li style="margin-bottom: 15px; border-bottom: 1px dashed #eee; padding-bottom: 10px;">
+                        <h4><a href="#">{{ foro.title }}</a></h4>
+                        <p style="color: #666; margin: 5px 0;">{{ foro.description }}</p>
+                        <small>📝 Temas activos: {{ foro.threads.count }}</small>
+                    </li>
+                {% endfor %}
+            </ul>
+        </div>
+
+    {% empty %}
+        <p>Esta facultad aún no tiene subforos creados.</p>
+    {% endfor %}
+{% endblock content %}

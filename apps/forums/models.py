@@ -18,7 +18,14 @@ class Faculty(models.Model):
 
     def __str__(self):
         return self.short_name
+    
 
+class Category(models.Model):
+    name = models.CharField(max_length=50, unique=True) # Ej: "Carreras", "Deportes"
+    description = models.CharField(max_length=200, blank=True)
+
+    def __str__(self):
+        return self.name
 
 
 class Forum(models.Model):
@@ -27,9 +34,11 @@ class Forum(models.Model):
     
     
     faculty = models.ForeignKey(Faculty, on_delete=models.CASCADE, related_name='forums')
+    category = models.ForeignKey(Category, on_delete=models.SET_NULL, null=True, related_name='forums')
     
     def __str__(self):
-        return f"{self.faculty.short_name} - {self.title}"
+        return f"[{self.category}] {self.faculty.short_name} - {self.title}"
+
 
 
 class Thread(models.Model):
@@ -42,6 +51,7 @@ class Thread(models.Model):
     
     # Sistema de Likes
     likes = models.ManyToManyField(User, related_name='liked_threads', blank=True)
+    dislikes = models.ManyToManyField(User, related_name='disliked_threads', blank=True)
 
     def __str__(self):
         return self.title
