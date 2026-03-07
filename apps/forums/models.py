@@ -3,6 +3,7 @@ from django.db import models
 # Create your models here.
 from django.db import models
 from django.contrib.auth import get_user_model
+from django.utils.text import slugify
 
 User = get_user_model()
 
@@ -31,6 +32,7 @@ class Category(models.Model):
 class Forum(models.Model):
     title = models.CharField(max_length=100) 
     description = models.CharField(max_length=255)
+    slug = models.SlugField(max_length=255, unique=True, blank=True, null=True)
     
     
     faculty = models.ForeignKey(Faculty, on_delete=models.CASCADE, related_name='forums')
@@ -38,6 +40,12 @@ class Forum(models.Model):
     
     def __str__(self):
         return f"[{self.category}] {self.faculty.short_name} - {self.title}"
+    
+    def save(self, *args, **kwargs):
+        if not self.slug:
+            self.slug = slugify(self.title)
+        
+        super().save(*args, **kwargs)
 
 
 
@@ -45,6 +53,7 @@ class Thread(models.Model):
     title = models.CharField(max_length=200)
     text = models.TextField()
     date_created = models.DateTimeField(auto_now_add=True)
+    slug = models.SlugField(max_length=255, unique=True, blank=True, null=True)
     
     forum = models.ForeignKey(Forum, on_delete=models.CASCADE, related_name='threads')
     author = models.ForeignKey(User, on_delete=models.CASCADE, related_name='threads')
@@ -56,6 +65,10 @@ class Thread(models.Model):
     def __str__(self):
         return self.title
 
+    def save(self, *args, **kwargs):
+        if not self.slug:
+            self.slug = slugify(self.title)
+        super().save(*args, **kwargs)
 
 class Reply(models.Model):
     text = models.TextField()

@@ -1,0 +1,43 @@
+{% extends 'base.html' %}
+{% block title %} {{ forum.title }} | Foro {% endblock %}
+
+{% block content %}
+<div class="forum-header">
+    <h1>{{ forum.title }}</h1>
+    <p>{{ forum.description }}</p>
+</div>
+
+<div class="threads-list">
+    <h3>Temas</h3>
+    {% if forum.threads.exists %}
+        <ul>
+            {% for thread in forum.threads.all %}
+                <li>
+                    <a href="#">
+                        {{ thread.title }}
+                    </a>
+                    {{ thread.text }}
+                    <small>Creado por {{ thread.author.username }} el {{ thread.date_created|date:"d M Y H:i" }}</small>
+                </li>
+            {% endfor %}
+        </ul>
+    {% else %}
+        <p>Aún no hay temas en este foro. ¡Sé el primero en crear uno!</p>
+    {% endif %}
+</div>
+
+<hr>
+
+<div class="new-thread-section">
+    {% if user.is_authenticated %}
+        <h3>Crear un nuevo tema</h3>
+        <form method="post" action="{% url 'forums:forum_detail' forum.faculty.short_name forum.slug %}">
+            {% csrf_token %}
+            {{ form.as_p }}
+            <button type="submit">Publicar</button>
+        </form>
+    {% else %}
+        <p>Para crear un tema debes <a href="{% url 'users:login' %}?next={{ request.path }}">iniciar sesión</a> o <a href="{% url 'users:signup' %}">registrarte</a>.</p>
+    {% endif %}
+</div>
+{% endblock %}

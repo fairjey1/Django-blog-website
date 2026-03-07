@@ -32,7 +32,7 @@
             <ul class="lista-foros" style="list-style: none; padding-left: 0;">
                 {% for foro in grupo.list %}
                     <li style="margin-bottom: 15px; border-bottom: 1px dashed #eee; padding-bottom: 10px;">
-                        <h4><a href="#">{{ foro.title }}</a></h4>
+                        <h4><a href="{% url 'forums:forum_detail' short_name=faculty.short_name slug=foro.slug %}">{{ foro.title }}</a></h4>
                         <p style="color: #666; margin: 5px 0;">{{ foro.description }}</p>
                         <small>📝 Temas activos: {{ foro.threads.count }}</small>
                     </li>
