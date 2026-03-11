@@ -1,0 +1,103 @@
+{% extends 'base.html' %}
+{% load static %}
+
+{% block title %}{{ thread.author.username }} posteo "{{ thread.title }}"{% endblock %}
+
+{% block content %}
+<div class="container my-5">
+    <!-- Thread Header -->
+    <div class="card mb-4">
+        <div class="card-body">
+            <h1 class="card-title">{{ thread.title }}</h1>
+            <p class="text-muted">
+                Posted by <strong><a href="{% url 'users:profile' thread.author.username %}">{{ thread.author.username }}</a></strong>
+                on {{ thread.date_created|date:"d M Y H:i" }}
+            </p>
+            <hr>
+            <div class="card-text">
+                {{ thread.content }}
+            </div>
+            {% if user == thread.author %}
+                <div class="mt-3">
+                    <button><a href="{% url 'forums:thread_delete' thread.slug %}" class="btn btn-sm btn-danger">Delete</a></button>
+                </div>
+            {% endif %}
+        </div>
+    </div>
+
+    <!-- Add Reply Form -->
+    {% if user.is_authenticated %}
+        <div id="original-form-location">
+            <div id="form-container">
+                <h3>Dejar una respuesta</h3>
+                <form id="reply-form" method="post" action="{% url 'forums:thread_detail' thread.slug %}">
+                    {% csrf_token %}
+                    {{ form.as_p }}
+                    
+                    <input type="hidden" name="parent_id" id="parent_id_field" value=""> 
+                    
+                    <button type="submit">Publicar Respuesta</button>
+                    <button type="button" id="cancel-reply" style="display: none;">Cancelar / Responder al Hilo</button>
+                </form>
+            </div>
+        </div>
+    {% else %}
+        <p class="mt-4"><a href="{% url 'users:login' %}?next={{ request.path }}">Login</a> to reply to this thread.</p>
+    {% endif %}
+
+    <!-- Replies Section -->
+    <h3>Respuestas ({{ thread.replies.count }})</h3>
+
+    <div class="thread-replies">
+        {% for reply in root_replies %}
+            {% include 'forums/includes/reply_snippet.html' with reply=reply %}
+        {% empty %}
+            <p class="text-muted">No replies yet.</p>
+        {% endfor %}
+    </div>
+
+</div>
+
+<script>
+    document.addEventListener("DOMContentLoaded", function() {
+        // Elementos clave del DOM
+        const formContainer = document.getElementById('form-container');
+        const originalLocation = document.getElementById('original-form-location');
+        const parentIdField = document.getElementById('parent_id_field');
+        const cancelBtn = document.getElementById('cancel-reply');
+
+        // Seleccionamos todos los botones "Responder" de los comentarios
+        const replyButtons = document.querySelectorAll('.btn-reply');
+
+        replyButtons.forEach(button => {
+            button.addEventListener('click', function() {
+                // 1. Obtenemos el ID del comentario al que le dimos clic
+                const replyId = this.getAttribute('data-reply-id');
+                
+                // 2. Asignamos ese ID al campo oculto del formulario
+                parentIdField.value = replyId;
+                
+                // 3. Movemos el formulario físicamente debajo de este botón
+                // 'this.parentElement' es el div del comentario específico
+                this.parentElement.appendChild(formContainer);
+                
+                // 4. Mostramos el botón de cancelar y enfocamos la caja de texto
+                cancelBtn.style.display = 'inline-block';
+                document.querySelector('#reply-form textarea').focus();
+            });
+        });
+
+        // Lógica para cancelar y volver al hilo principal
+        cancelBtn.addEventListener('click', function() {
+            // 1. Vaciamos el ID (para que vuelva a ser respuesta al Hilo)
+            parentIdField.value = '';
+            
+            // 2. Devolvemos el formulario a su lugar original arriba/abajo
+            originalLocation.appendChild(formContainer);
+            
+            // 3. Ocultamos el botón de cancelar
+            this.style.display = 'none';
+        });
+    });
+</script>
+{% endblock %}

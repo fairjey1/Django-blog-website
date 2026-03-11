@@ -47,8 +47,6 @@ class Forum(models.Model):
         
         super().save(*args, **kwargs)
 
-
-
 class Thread(models.Model):
     title = models.CharField(max_length=200)
     text = models.TextField()
@@ -75,10 +73,14 @@ class Reply(models.Model):
     date_created = models.DateTimeField(auto_now_add=True)
     
     thread = models.ForeignKey(Thread, on_delete=models.CASCADE, related_name='replies')
+    parent = models.ForeignKey('self', on_delete=models.CASCADE, related_name='children', null=True, blank=True)
     author = models.ForeignKey(User, on_delete=models.CASCADE, related_name='replies')
     
     likes = models.ManyToManyField(User, related_name='liked_replies', blank=True)
     dislikes = models.ManyToManyField(User, related_name='disliked_replies', blank=True)
 
+    class Meta:
+        ordering = ['date_created'] 
+
     def __str__(self):
-        return f"Respuesta de {self.author.username} en {self.thread.title}"
+        return f'Reply by {self.author} "{self.text[:30]}..." on {self.thread.title}'

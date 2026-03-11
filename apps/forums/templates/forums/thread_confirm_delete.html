@@ -1,0 +1,22 @@
+{% extends 'base.html' %}
+
+{% block content %}
+<div class="delete-confirmation">
+    <h2>¿Estás seguro de que deseas borrar este thread?</h2>
+    
+    <div style="border: 1px solid #ccc; padding: 10px; margin: 20px 0; background-color: #f9f9f9;">
+        <p><strong>Título:</strong> {{ object.title }}</p>
+        <p>"{{ object.text }}"</p>
+    </div>
+    
+    <p style="color: red;"><strong>Advertencia:</strong> Si este thread tiene respuestas, también serán eliminadas de forma permanente.</p>
+
+    <form method="post" action="{% url 'forums:thread_delete' object.slug %}">
+        {% csrf_token %}
+        <button type="submit" style="background-color: red; color: white; padding: 5px 10px; border: none; cursor: pointer;">
+            Sí, borrar definitivamente
+        </button>
+        <a href="{% url 'forums:thread_detail' object.slug %}" style="margin-left: 10px;">Cancelar</a>
+    </form>
+</div>
+{% endblock %}

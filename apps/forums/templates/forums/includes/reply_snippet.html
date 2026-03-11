@@ -1,0 +1,26 @@
+<div class="reply-node" style="margin-left: 20px; border-left: 2px solid #ddd; padding-left: 10px; margin-top: 10px;">
+    
+    <div class="reply-header">
+        <small><strong><a href="{% url 'users:profile' reply.author.username %}">{{ reply.author.username }}</a></strong> - {{ reply.date_created|date:"d M Y H:i" }}</small>
+    </div>
+    <div class="reply-content">
+        <p>{{ reply.text }}</p>
+    </div>
+
+    <button class="btn-reply" data-reply-id="{{ reply.id }}">Responder</button>
+    {% if request.user == reply.author %}
+        <button><a href="{% url 'forums:reply_delete' reply.id %}" style="color: red">
+            Borrar comentario
+        </a></button>
+    {% endif %}
+
+    {% if reply.children.exists %}
+        <div class="reply-children">
+            {% for child in reply.children.all %}
+                {% include 'forums/includes/reply_snippet.html' with reply=child %}
+            {% endfor %}
+        </div>
+    {% endif %}
+
+</div>
+
