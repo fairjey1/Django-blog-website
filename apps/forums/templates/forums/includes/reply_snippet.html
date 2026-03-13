@@ -8,6 +8,15 @@
     </div>
 
     <button class="btn-reply" data-reply-id="{{ reply.id }}">Responder</button>
+    <div class="reply-votes">
+        <button class="vote-btn" data-url="{% url 'forums:vote' 'reply' reply.pk 'like' %}" data-target-id="reply-{{ reply.pk }}">
+            👍 <span id="like-count-reply-{{ reply.pk }}">{{ reply.likes.count }}</span>
+        </button>
+        
+        <button class="vote-btn" data-url="{% url 'forums:vote' 'reply' reply.pk 'dislike' %}" data-target-id="reply-{{ reply.pk }}">
+            👎 <span id="dislike-count-reply-{{ reply.pk }}">{{ reply.dislikes.count }}</span>
+        </button>
+    </div>
     {% if request.user == reply.author %}
         <button><a href="{% url 'forums:reply_delete' reply.id %}" style="color: red">
             Borrar comentario

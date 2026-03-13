@@ -1,6 +1,6 @@
 {% extends 'base.html' %}
 {% block title %} {{ forum.title }} | Foro {% endblock %}
-
+{% load static %}
 {% block content %}
 <div class="forum-header">
     <h1>{{ forum.title }}</h1>
@@ -33,6 +33,15 @@
                     </a>
                     {{ thread.text }}
                     <small>Creado por {{ thread.author.username }} el {{ thread.date_created|date:"d M Y H:i" }}</small>
+                    <div class="thread-votes">
+                        <button class="vote-btn" data-url="{% url 'forums:vote' 'thread' thread.pk 'like' %}" data-target-id="thread-{{ thread.pk }}">
+                            👍 <span id="like-count-thread-{{ thread.pk }}">{{ thread.likes.count }}</span>
+                        </button>
+                
+                        <button class="vote-btn" data-url="{% url 'forums:vote' 'thread' thread.pk 'dislike' %}" data-target-id="thread-{{ thread.pk }}">
+                            👎 <span id="dislike-count-thread-{{ thread.pk }}">{{ thread.dislikes.count }}</span>
+                        </button>      
+                    </div>
                 </li>
             {% endfor %}
         </ul>
@@ -40,6 +49,5 @@
         <p>Aún no hay threads en este foro. ¡Sé el primero en crear uno!</p>
     {% endif %}
 </div>
-
-
+<script src="{% static 'js/votes.js' %}"></script>
 {% endblock %}

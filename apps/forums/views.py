@@ -1,7 +1,7 @@
-from django.http import HttpResponseForbidden
+from django.http import HttpResponseForbidden, JsonResponse
 from django.shortcuts import get_object_or_404, render
 from django.urls import reverse_lazy
-from django.views.generic import DeleteView, DetailView, ListView
+from django.views.generic import DeleteView, DetailView, ListView, View
 from django.views.generic.edit import FormMixin
 from django.contrib.auth.mixins import LoginRequiredMixin, UserPassesTestMixin
 
@@ -128,20 +128,15 @@ class ThreadDetailView(FormMixin, DetailView):
         context['root_replies'] = root_replies
         return context
 
-class ReplyDeleteView(LoginRequiredMixin, UserPassesTestMixin, DeleteView):
+class ReplyDeleteView(LoginRequiredMixin, UserPassesTestMixin, DeleteView):  
     model = Reply
     template_name = 'forums/reply_confirm_delete.html'
 
-    def test_func(self):
-        # Esta función de Django comprueba si el usuario tiene permiso.
-        # Obtenemos el comentario que se intenta borrar.
+    def test_func(self): # UserPassesTestMixin llama este metodo para ver si el usuario tiene permiso
         reply = self.get_object()
-        # Devuelve True solo si el usuario logueado es el autor original.
         return self.request.user == reply.author
 
-    def get_success_url(self):
-        # Tras borrar, redirigimos de vuelta al Hilo original.
-        # self.object aún guarda los datos en memoria en este punto del ciclo de vida.
+    def get_success_url(self): # a partir del borrado "object" es el thread que pertenecia a la repsuesta
         return reverse_lazy('forums:thread_detail', kwargs={'slug': self.object.thread.slug})
     
 class ThreadDeleteView(LoginRequiredMixin, UserPassesTestMixin, DeleteView):
@@ -158,4 +153,36 @@ class ThreadDeleteView(LoginRequiredMixin, UserPassesTestMixin, DeleteView):
             'slug': self.object.forum.slug
         })
 
+class VoteView(LoginRequiredMixin, View):
 
+    MODELS_MAP = {
+        'thread': Thread,
+        'reply': Reply
+    }
+
+    def post(self, request, model_type, pk, action):
+        ModelClass = self.MODELS_MAP.get(model_type)
+        if not ModelClass:
+            return JsonResponse({'error': 'Modelo inválido'}, status=400)
+
+        obj = get_object_or_404(ModelClass, pk=pk)
+        user = request.user
+
+        if action == 'like':
+            if user in obj.likes.all():
+                obj.likes.remove(user)
+            else:
+                obj.likes.add(user)
+                obj.dislikes.remove(user)
+
+        elif action == 'dislike':
+            if user in obj.dislikes.all():
+                obj.dislikes.remove(user)
+            else:
+                obj.dislikes.add(user)
+                obj.likes.remove(user)
+
+        return JsonResponse({
+            'likes_count': obj.likes.count(),
+            'dislikes_count': obj.dislikes.count()
+        })
