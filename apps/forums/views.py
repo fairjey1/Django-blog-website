@@ -154,14 +154,14 @@ class ThreadDeleteView(LoginRequiredMixin, UserPassesTestMixin, DeleteView):
         })
 
 class VoteView(LoginRequiredMixin, View):
-
+    # como esta view maneja votos para threads y replies, uso un mapa para identificar el modelo correcto a partir de la URL
     MODELS_MAP = {
         'thread': Thread,
         'reply': Reply
     }
 
     def post(self, request, model_type, pk, action):
-        ModelClass = self.MODELS_MAP.get(model_type)
+        ModelClass = self.MODELS_MAP.get(model_type) 
         if not ModelClass:
             return JsonResponse({'error': 'Modelo inválido'}, status=400)
 
@@ -182,7 +182,7 @@ class VoteView(LoginRequiredMixin, View):
                 obj.dislikes.add(user)
                 obj.likes.remove(user)
 
-        return JsonResponse({
+        return JsonResponse({ # devolvemos un json para actualizar el front sin recargar la pagina
             'likes_count': obj.likes.count(),
             'dislikes_count': obj.dislikes.count()
         })

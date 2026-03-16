@@ -8,11 +8,11 @@
         <p>"{{ object.text }}"</p>
     </div>
     
-    <p style="color: red;"><strong>Advertencia:</strong> Si este comentario tiene respuestas, también serán eliminadas de forma permanente.</p>
+    <p><strong>Advertencia:</strong> Si este comentario tiene respuestas, también serán eliminadas de forma permanente.</p>
 
     <form method="post" action="{% url 'forums:reply_delete' object.id %}">
         {% csrf_token %}
-        <button type="submit" style="background-color: red; color: white; padding: 5px 10px; border: none; cursor: pointer;">
+        <button type="submit">
             Sí, borrar definitivamente
         </button>
         <a href="{% url 'forums:thread_detail' object.thread.slug %}" style="margin-left: 10px;">Cancelar</a>
