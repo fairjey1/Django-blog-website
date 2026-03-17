@@ -14,13 +14,17 @@ class FacultyAdmin(admin.ModelAdmin):
 
 @admin.register(Category)
 class CategoryAdmin(admin.ModelAdmin):
-    list_display = ('name', 'description')
+    list_display = ('name', 'description', 'order')
+    ordering = ('order',)  # Ordenar por el campo 'order' en la interfaz de administración
 
 @admin.register(Forum)
 class ForumAdmin(admin.ModelAdmin):
-    list_display = ('title', 'faculty', 'category')
+    list_display = ('title', 'faculty_list', 'category') 
     search_fields = ('title', 'description')
     list_filter = ('faculty', 'category')
+
+    def faculty_list(self, obj): # this is a custom method to display the faculties in the list view
+        return ", ".join([f.short_name for f in obj.faculty.all()])
 
 @admin.register(Thread)
 class ThreadAdmin(admin.ModelAdmin):

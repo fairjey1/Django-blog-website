@@ -21,6 +21,13 @@ class FacultyFeedView(DetailView):
     slug_field = 'short_name'
     slug_url_kwarg = 'short_name'
 
+    def get_context_data(self, **kwargs):
+        context = super().get_context_data(**kwargs)
+        context['forums'] = Forum.objects.filter(
+            faculty=self.object
+        ).select_related('category').order_by('category__order', 'title') 
+        return context
+
 class ForumDetailView(FormMixin, DetailView): # formMixin para manejar el formulario de creación de Threads dentro del DetailView del Forum
     model = Forum
     template_name = 'forums/forum_detail.html'
@@ -63,7 +70,7 @@ class ForumDetailView(FormMixin, DetailView): # formMixin para manejar el formul
 
     def get_success_url(self):
         return reverse_lazy('forums:forum_detail', kwargs={
-            'short_name': self.object.faculty.short_name, 
+            'short_name': self.kwargs.get('short_name'), # directamente de la url 
             'slug': self.object.slug
         })
     

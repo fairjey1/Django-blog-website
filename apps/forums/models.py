@@ -24,6 +24,10 @@ class Faculty(models.Model):
 class Category(models.Model):
     name = models.CharField(max_length=50, unique=True) # Ej: "Carreras", "Deportes"
     description = models.CharField(max_length=200, blank=True)
+    order = models.PositiveIntegerField(default=0)
+
+    class Meta:  
+        ordering = ['order'] 
 
     def __str__(self):
         return self.name
@@ -35,11 +39,11 @@ class Forum(models.Model):
     slug = models.SlugField(max_length=255, unique=True, blank=True, null=True)
     
     
-    faculty = models.ForeignKey(Faculty, on_delete=models.CASCADE, related_name='forums')
+    faculty = models.ManyToManyField(Faculty, related_name='forums')
     category = models.ForeignKey(Category, on_delete=models.SET_NULL, null=True, related_name='forums')
     
     def __str__(self):
-        return f"[{self.category}] {self.faculty.short_name} - {self.title}"
+        return f"[{self.category}] {', '.join([f.short_name for f in self.faculty.all()])} - {self.title}"
     
     def save(self, *args, **kwargs):
         if not self.slug:

@@ -12,7 +12,7 @@
 <div class="new-thread-section">
     {% if user.is_authenticated %}
         <h3>Crear un nuevo thread</h3>
-        <form method="post" action="{% url 'forums:forum_detail' forum.faculty.short_name forum.slug %}">
+        <form method="post" action="{% url 'forums:forum_detail' view.kwargs.short_name forum.slug %}">
             {% csrf_token %}
             {{ form.as_p }}
             <button type="submit">Publicar</button>
